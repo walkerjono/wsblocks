@@ -38,23 +38,58 @@ export const getPgPool = () => {
 let redisClient: Redis | undefined
 
 const getRedisClient = () => {
+  // If Redis is explicitly disabled, return undefined
+  if (runtimeConfig.redisEnabled === 'false') {
+    return undefined
+  }
+
+  // If we already have a Redis client, return it
   if (redisClient) {
     return redisClient
   } else {
-    if (runtimeConfig.preset == 'node-server') {
-      redisClient = new Redis(runtimeConfig.redisUrl)
-      return redisClient
+    // Only try to create a Redis client if we're in node-server mode, Redis is enabled, and Redis URL is provided
+    if (runtimeConfig.preset == 'node-server' && runtimeConfig.redisEnabled === 'true' && runtimeConfig.redisUrl) {
+      try {
+        redisClient = new Redis(runtimeConfig.redisUrl)
+        return redisClient
+      } catch (error) {
+        console.error(`Failed to connect to Redis: ${error}. Falling back to alternative cache.`)
+        return undefined
+      }
     }
   }
 }
+
+// Simple in-memory cache for node-server mode when Redis is not available
+const inMemoryCache = new Map<string, { value: string, expiry: number | null }>()
 
 export const cacheClient = {
   get: async (key: string) => {
     const client = getRedisClient()
     if (client) {
-      const value = await client.get(key)
-      return value
+      try {
+        const value = await client.get(key)
+        return value
+      } catch (error) {
+        console.error(`Redis get operation failed: ${error}. Falling back to alternative cache.`)
+      }
+    }
+
+    // If Redis is not available and we're in node-server mode, use in-memory cache
+    if (runtimeConfig.preset == 'node-server') {
+      const cached = inMemoryCache.get(key)
+      if (cached) {
+        // Check if the cache entry has expired
+        if (cached.expiry === null || cached.expiry > Date.now()) {
+          return cached.value
+        } else {
+          // Remove expired entry
+          inMemoryCache.delete(key)
+        }
+      }
+      return null
     } else {
+      // For non-node-server presets, use hubKV
       const value = await hubKV().get(key)
       if (!value) {
         return null
@@ -66,12 +101,26 @@ export const cacheClient = {
     const client = getRedisClient()
     const stringValue = typeof value === 'string' ? value : JSON.stringify(value)
     if (client) {
-      if (ttl) {
-        await client.set(key, stringValue, 'EX', ttl)
-      } else {
-        await client.set(key, stringValue)
+      try {
+        if (ttl) {
+          await client.set(key, stringValue, 'EX', ttl)
+        } else {
+          await client.set(key, stringValue)
+        }
+        return
+      } catch (error) {
+        console.error(`Redis set operation failed: ${error}. Falling back to alternative cache.`)
       }
+    }
+
+    // If Redis is not available and we're in node-server mode, use in-memory cache
+    if (runtimeConfig.preset == 'node-server') {
+      inMemoryCache.set(key, {
+        value: stringValue,
+        expiry: ttl ? Date.now() + (ttl * 1000) : null
+      })
     } else {
+      // For non-node-server presets, use hubKV
       if (ttl) {
         await hubKV().set(key, stringValue, { ttl })
       } else {
@@ -82,8 +131,19 @@ export const cacheClient = {
   delete: async (key: string) => {
     const client = getRedisClient()
     if (client) {
-      await client.del(key)
+      try {
+        await client.del(key)
+        return
+      } catch (error) {
+        console.error(`Redis delete operation failed: ${error}. Falling back to alternative cache.`)
+      }
+    }
+
+    // If Redis is not available and we're in node-server mode, use in-memory cache
+    if (runtimeConfig.preset == 'node-server') {
+      inMemoryCache.delete(key)
     } else {
+      // For non-node-server presets, use hubKV
       await hubKV().del(key)
     }
   }
