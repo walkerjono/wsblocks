@@ -155,7 +155,7 @@ const createBetterAuth = () => betterAuth({
   plugins: [
     ...(runtimeConfig.public.appEnv === 'development' ? [openAPI()] : []),
     admin(),
-    setupStripe()
+    ...(runtimeConfig.stripeEnabled === 'true' ? [setupStripe()] : [])
   ]
 })
 
