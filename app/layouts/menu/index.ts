@@ -9,11 +9,6 @@ export const getMenus = (t: TranFunction, localePath: LocalePathFunction, appRep
         to: localePath('/admin/dashboard')
       },
       {
-        label: t('menu.users'),
-        icon: 'i-lucide-users',
-        to: localePath('/admin/user')
-      },
-      {
         label: t('menu.subscriptions'),
         icon: 'i-lucide-credit-card',
         to: localePath('/admin/subscription')
@@ -22,6 +17,11 @@ export const getMenus = (t: TranFunction, localePath: LocalePathFunction, appRep
         label: t('menu.maintenance'),
         icon: 'i-lucide-wrench',
         children: [
+          {
+            label: t('menu.users'),
+            icon: 'i-lucide-users',
+            to: localePath('/admin/user')
+          },
           {
             label: t('menu.auditLog'),
             icon: 'i-lucide-history',
