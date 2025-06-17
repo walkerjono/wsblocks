@@ -247,14 +247,14 @@ defineExpose({
       </template>
     </UTable>
     <Pagination
-      :model-value="page"
+      :page="page"
       :limit="limit"
       :total="total"
       :hide-pagination="hidePagination"
       :can-select="canSelect"
       :selected-row-count="selectedRowCount"
       :row-count="rowCount"
-      @update:model-value="updatePage"
+      @update:page="updatePage"
       @update:limit="updateLimit"
     />
   </div>

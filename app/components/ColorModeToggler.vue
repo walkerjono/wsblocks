@@ -1,17 +1,14 @@
 <script setup lang="ts">
 const colorMode = useColorMode()
+
 const toggleColorMode = () => {
-  if (colorMode.value == 'light') {
-    colorMode.value = 'dark'
-  } else {
-    colorMode.value = 'light'
-  }
+  colorMode.preference = colorMode.value === 'light' ? 'dark' : 'light'
 }
 </script>
 
 <template>
   <UButton
-    :icon="colorMode.value == 'light' ? 'i-lucide-moon' : 'i-lucide-sun'"
+    :icon="colorMode.value === 'light' ? 'i-lucide-moon' : 'i-lucide-sun'"
     color="neutral"
     variant="ghost"
     @click="toggleColorMode"

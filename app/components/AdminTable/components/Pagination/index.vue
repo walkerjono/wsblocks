@@ -8,9 +8,6 @@ const { hidePagination, selectedRowCount, rowCount, total } = defineProps({
   rowCount: { type: Number, default: 0 },
   total: { type: Number, default: 0 }
 })
-const emit = defineEmits<{
-  change: []
-}>()
 const { t } = useI18n()
 const page = defineModel('page', { default: 1 })
 const limit = defineModel('limit', { default: 20 })
@@ -18,14 +15,6 @@ const totalPage = computed(() => {
   return Math.ceil(total / limit.value)
 })
 const sizes = [5, 20, 50, 100]
-
-watch(
-  page,
-  () => {
-    emit('change')
-  },
-  { immediate: true }
-)
 </script>
 
 <template>
@@ -47,7 +36,6 @@ watch(
       <USelect
         v-model="limit"
         :items="sizes"
-        @change="emit('change')"
       />
       <span class="ml-4 mr-4 text-sm">{{ t('pagination.pageOf', { page, totalPage }) }}</span>
       <UPagination
