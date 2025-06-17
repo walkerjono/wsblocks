@@ -19,9 +19,15 @@
         "edit": "Edit",
         "delete": "Delete",
         "cancel": "Cancel",
+        "save": "Save",
         "name": "Name",
         "status": "Status",
         "createdAt": "Created At",
+        "createdBy": "Created By",
+        "updatedAt": "Updated At",
+        "updatedBy": "Updated By",
+        "isActive": "Active",
+        "externalReference": "External Reference",
         "all": "All"
       }
     }

@@ -2,14 +2,15 @@
   "en": {
     "menu": {
       "navigation": "Navigation",
+      "home": "Home",
       "search": "Search",
       "dashboard": "Dashboard",
-      "users": "Users",
+      "companies": "Companies",
       "subscriptions": "Subscriptions",
       "maintenance": "Settings",
-      "dbStats": "Database Status",
-      "home": "Home",
-      "auditLog": "Audit Log"
+      "users": "Users",
+      "auditLog": "Audit Log",
+      "dbStats": "Database Status"
     }
   }
 }

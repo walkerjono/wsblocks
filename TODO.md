@@ -13,5 +13,8 @@
 ERD
 
 - [ ] Company
-  - review files inc. admin, auditLog, APIs etc. db.ts
+  - review files inc. AuditLog
+  - default columns
+  - default sort
+  - delete
 - [ ] Project

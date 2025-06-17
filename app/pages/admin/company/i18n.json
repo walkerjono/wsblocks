@@ -1,0 +1,35 @@
+{
+  "en": {
+    "company": {
+      "title": "Company Management",
+      "columns": {
+        "name": "Company Name",
+        "type": "Type",
+        "isActive": "Status",
+        "externalReference": "External Reference",
+        "createdAt": "Created At",
+        "createdBy": "Created By",
+        "updatedAt": "Updated At",
+        "updatedBy": "Updated By"
+      },
+      "status": {
+        "active": "Active",
+        "inactive": "Inactive"
+      },
+      "types": {
+        "customer": "Customer"
+      },
+      "actions": {
+        "createCompany": "Create Company",
+        "editCompany": "Edit"
+      },
+      "form": {
+        "name": "Company Name",
+        "type": "Type"
+      },
+      "validation": {
+        "nameMin": "Company name must be at least {n} characters"
+      }
+    }
+  }
+}
