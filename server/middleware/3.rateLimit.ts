@@ -1,6 +1,5 @@
 import type { H3Event } from 'h3'
 import { isRateLimited } from '../utils/rateLimit'
-import { runtimeConfig } from '../utils/runtimeConfig'
 
 export default defineEventHandler(async (event: H3Event) => {
   const path = event.path

@@ -1,5 +1,5 @@
 import { createHmac } from 'node:crypto'
-import { getHeader, getQuery, type H3Event, readBody, setHeaders } from 'h3'
+import { getHeader, getQuery, type H3Event, readBody } from 'h3'
 import { runtimeConfig } from './runtimeConfig'
 
 /**

@@ -2,7 +2,6 @@ import type { H3Event } from 'h3'
 import { setHeaders } from 'h3'
 import { getAuthSession } from '../utils/auth'
 import { generateCsrfToken, getCsrfToken, validateCsrfToken } from '../utils/csrf'
-import { runtimeConfig } from '../utils/runtimeConfig'
 
 // List of routes that should be exempt from CSRF protection
 const exemptRoutes = [

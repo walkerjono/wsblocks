@@ -1,4 +1,4 @@
-import { getHeader, getQuery, type H3Event, setHeaders } from 'h3'
+import { getHeader, type H3Event, setHeaders } from 'h3'
 import { runtimeConfig } from './runtimeConfig'
 
 // Simple in-memory store for rate limiting
