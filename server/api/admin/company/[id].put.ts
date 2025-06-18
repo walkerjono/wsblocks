@@ -20,10 +20,8 @@ export default defineEventHandler(async (event) => {
   try {
     // The middleware 1.auth.ts already checks if the user is an admin
     session = await requireAuth(event)
-    console.log('Session:', session)
 
     id = getRouterParam(event, 'id')
-    console.log('Company ID:', id)
     if (!id) {
       throw createError({
         statusCode: 400,
@@ -33,7 +31,6 @@ export default defineEventHandler(async (event) => {
     }
 
     const body = await readValidatedBody(event, body => schema.parse(body))
-    console.log('Request body:', body)
     const db = getDB()
 
     // Check if company exists
@@ -68,9 +65,9 @@ export default defineEventHandler(async (event) => {
 
     await logAuditEvent({
       userId: session.user.id,
-      category: 'auth',
+      category: 'company',
       action: 'update',
-      targetType: 'email',
+      targetType: 'company',
       targetId: id,
       status: 'success'
     })
@@ -85,15 +82,22 @@ export default defineEventHandler(async (event) => {
     if (typeof session !== 'undefined' && session.user) {
       await logAuditEvent({
         userId: session.user.id,
-        category: 'auth',
+        category: 'company',
         action: 'update',
-        targetType: 'email',
+        targetType: 'company',
         targetId: id || 'unknown',
         status: 'failure',
         details: error instanceof Error ? error.message : String(error)
       })
     }
 
+    // Check if the error is an H3Error or has a statusCode property
+    if (error && (error as any).statusCode) {
+      // Re-throw the original error to preserve the HTTP status
+      throw error
+    }
+
+    // Only convert unknown errors to a 500 error
     throw createError({
       statusCode: 500,
       statusMessage: 'Internal Server Error',

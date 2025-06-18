@@ -9,7 +9,6 @@ const emit = defineEmits<{
 }>()
 
 const open = defineModel('open', { default: false })
-const { client: _client } = useAuth()
 
 const schema = z.object({
   name: z.string().min(4, t('company.validation.nameMin', { n: 4 })),
@@ -26,20 +25,31 @@ const state = reactive({
   externalReference: ''
 })
 
+const pending = ref(false)
+
 async function onSubmit({ data }: FormSubmitEvent<Schema>) {
-  // Use the API endpoint we created
-  const res = await $fetch<{ company: any }>('/api/admin/company/create', {
-    method: 'POST',
-    body: {
-      name: data.name,
-      type: data.type,
-      isActive: data.isActive,
-      externalReference: data.externalReference || undefined
+  if (pending.value)
+    return
+  pending.value = true
+  try {
+    const res = await $fetch<{ company: any }>('/api/admin/company/create', {
+      method: 'POST',
+      body: {
+        name: data.name,
+        type: data.type,
+        isActive: data.isActive,
+        externalReference: data.externalReference || undefined
+      }
+    })
+    if (res?.company) {
+      open.value = false
+      emit('created')
     }
-  })
-  if (res && res.company) {
-    open.value = false
-    emit('created')
+  } catch (err) {
+    console.error(err)
+    useToast().add({ title: 'Error', description: t('global.page.saveFailed'), color: 'error' })
+  } finally {
+    pending.value = false
   }
 }
 
@@ -113,6 +123,7 @@ const onCancel = () => {
           <UButton
             type="submit"
             color="primary"
+            :disabled="pending"
           >
             {{ t('global.page.create') }}
           </UButton>

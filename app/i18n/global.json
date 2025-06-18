@@ -20,6 +20,7 @@
         "delete": "Delete",
         "cancel": "Cancel",
         "save": "Save",
+        "saveFailed": "Save Failed",
         "name": "Name",
         "status": "Status",
         "createdAt": "Created At",

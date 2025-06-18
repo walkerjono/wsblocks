@@ -37,9 +37,9 @@ export default defineEventHandler(async (event) => {
 
     await logAuditEvent({
       userId: session.user.id,
-      category: 'auth', // Using 'auth' as a valid category
+      category: 'company',
       action: 'create',
-      targetType: 'email', // Using 'email' as a valid targetType
+      targetType: 'company',
       targetId: companyId,
       status: 'success'
     })
@@ -52,14 +52,21 @@ export default defineEventHandler(async (event) => {
 
     await logAuditEvent({
       userId: session.user.id,
-      category: 'auth',
+      category: 'company',
       action: 'create',
-      targetType: 'email',
+      targetType: 'company',
       targetId: companyId,
       status: 'failure',
       details: error instanceof Error ? error.message : String(error)
     })
 
+    // Check if the error is an H3Error or has a statusCode property
+    if (error && (error as any).statusCode) {
+      // Re-throw the original error to preserve the HTTP status
+      throw error
+    }
+
+    // Only convert unknown errors to a 500 error
     throw createError({
       statusCode: 500,
       statusMessage: 'Internal Server Error',

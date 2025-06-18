@@ -14,7 +14,6 @@ interface Company {
 }
 
 const { t } = useI18n()
-const { client: _client } = useAuth()
 const isCompanyModalOpen = ref(false)
 const isEditCompanyModalOpen = ref(false)
 const selectedCompanyId = ref('')
@@ -149,8 +148,7 @@ const fetchStatusCount = async (filter: FilterCondition[]) => {
 }
 
 const fetchData: FetchDataFn<Company> = async ({ page, limit, sort, filter }) => {
-  fetchTypeCount(filter)
-  fetchStatusCount(filter)
+  await Promise.allSettled([fetchTypeCount(filter), fetchStatusCount(filter)])
   const result = await $fetch<PageData<Company>>('/api/admin/list/company', {
     query: {
       page,

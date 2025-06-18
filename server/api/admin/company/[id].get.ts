@@ -1,4 +1,5 @@
 import { eq } from 'drizzle-orm'
+import { getRouterParam } from 'h3'
 import { company } from '../../../database/schema'
 import { requireAuth } from '../../../utils/auth'
 import { getDB } from '../../../utils/db'
@@ -18,7 +19,6 @@ export default defineEventHandler(async (event) => {
 
   try {
     const db = getDB()
-    console.log('DB:', db)
 
     // Use the select method instead of query
     const result = await db.select()
@@ -39,6 +39,14 @@ export default defineEventHandler(async (event) => {
     }
   } catch (error) {
     console.error('Error fetching company:', error)
+
+    // Check if the error is an H3Error or has a statusCode property
+    if (error && (error as any).statusCode) {
+      // Re-throw the original error to preserve the HTTP status
+      throw error
+    }
+
+    // Only convert unknown errors to a 500 error
     throw createError({
       statusCode: 500,
       statusMessage: 'Internal Server Error',

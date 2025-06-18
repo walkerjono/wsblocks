@@ -10,7 +10,6 @@ const emit = defineEmits<{
 }>()
 
 const open = defineModel('open', { default: false })
-const { client: _client } = useAuth()
 const loading = ref(false)
 const company = ref<any>(null)
 
@@ -62,6 +61,8 @@ watch([open, () => props.companyId], async ([isOpen, companyId]) => {
 })
 
 async function onSubmit({ data }: FormSubmitEvent<Schema>) {
+  if (loading.value)
+    return
   loading.value = true
   try {
     const res = await $fetch<{ company: any }>(`/api/admin/company/${props.companyId}`, {
@@ -79,6 +80,7 @@ async function onSubmit({ data }: FormSubmitEvent<Schema>) {
     }
   } catch (error) {
     console.error('Error updating company:', error)
+    useToast().add({ title: 'Error', description: props.t('global.page.saveFailed'), color: 'error' })
   } finally {
     loading.value = false
   }
@@ -164,6 +166,7 @@ const onCancel = () => {
           <UButton
             type="submit"
             color="primary"
+            :disabled="loading"
           >
             {{ t('global.page.save') }}
           </UButton>
