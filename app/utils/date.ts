@@ -31,7 +31,11 @@ export const toDate = (calendarDate: CalendarDate) => {
   return calendarDate.toDate(timezone)
 }
 
-export const formatToDate = (value: CalendarDate | Date | string) => {
+export const formatToDate = (value: CalendarDate | Date | string | null | undefined) => {
+  if (!value) {
+    return new Date() // Return current date as fallback
+  }
+
   let date
   if (value instanceof CalendarDate) {
     const timezone = getLocalTimeZone()
@@ -46,12 +50,15 @@ export const formatToDate = (value: CalendarDate | Date | string) => {
   return date
 }
 
-export const formatToDay = (value: CalendarDate | Date | string) => {
+export const formatToDay = (value: CalendarDate | Date | string | null | undefined) => {
+  if (!value) {
+    return ''
+  }
   const date = formatToDate(value)
   return format(date, DATE_FORMAT)
 }
 
-export const formatToDatetime = (value: CalendarDate | Date | string | undefined) => {
+export const formatToDatetime = (value: CalendarDate | Date | string | null | undefined) => {
   if (!value) {
     return ''
   }

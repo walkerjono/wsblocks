@@ -1,13 +1,15 @@
 import { v7 as uuidv7 } from 'uuid'
 import { z } from 'zod'
-import { company } from '../../../database/schema'
+import { project } from '../../../database/schema'
 import { logAuditEvent } from '../../../utils/auditLogger'
 import { requireAuth } from '../../../utils/auth'
 import { getDB } from '../../../utils/db'
 
 const schema = z.object({
   name: z.string().min(4),
-  type: z.enum(['customer']),
+  companyId: z.string().uuid(),
+  startDate: z.string().optional().transform(val => val ? new Date(val) : undefined),
+  endDate: z.string().optional().transform(val => val ? new Date(val) : undefined),
   tags: z.string().optional(),
   isActive: z.boolean(),
   externalReference: z.string().optional()
@@ -21,13 +23,19 @@ export default defineEventHandler(async (event) => {
   const db = getDB()
 
   const now = new Date()
-  const companyId = uuidv7()
+  const projectId = uuidv7()
 
   try {
-    const newCompany = await db.insert(company).values({
-      id: companyId,
+    // Insert a new project record
+    const newProject = await db.insert(project).values({
+      id: projectId,
       name: body.name,
-      type: body.type,
+      companyId: body.companyId,
+      startDate: body.startDate || null,
+      endDate: body.endDate || null,
+      schedulingDirection: 'forward',
+      schedulingMode: 'Normal',
+      isEffortDriven: false,
       tags: body.tags || null,
       isActive: body.isActive,
       externalReference: body.externalReference || null,
@@ -39,25 +47,25 @@ export default defineEventHandler(async (event) => {
 
     await logAuditEvent({
       userId: session.user.id,
-      category: 'company',
+      category: 'project',
       action: 'create',
-      targetType: 'company',
-      targetId: companyId,
+      targetType: 'project',
+      targetId: projectId,
       status: 'success'
     })
 
     return {
-      company: newCompany[0]
+      project: newProject[0]
     }
   } catch (error) {
-    console.error('Error creating company:', error)
+    console.error('Error creating project:', error)
 
     await logAuditEvent({
       userId: session.user.id,
-      category: 'company',
+      category: 'project',
       action: 'create',
-      targetType: 'company',
-      targetId: companyId,
+      targetType: 'project',
+      targetId: projectId,
       status: 'failure',
       details: error instanceof Error ? error.message : String(error)
     })
@@ -72,7 +80,7 @@ export default defineEventHandler(async (event) => {
     throw createError({
       statusCode: 500,
       statusMessage: 'Internal Server Error',
-      message: 'Failed to create company'
+      message: 'Failed to create project'
     })
   }
 })

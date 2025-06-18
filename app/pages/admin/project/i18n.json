@@ -1,0 +1,36 @@
+{
+  "en": {
+    "project": {
+      "title": "Project Management",
+      "columns": {
+        "name": "Project",
+        "company": "Company",
+        "start": "Start",
+        "end": "End",
+        "tags": "Tags",
+        "isActive": "Status",
+        "externalReference": "External Reference",
+        "createdAt": "Created At",
+        "createdBy": "Created By",
+        "updatedAt": "Updated At",
+        "updatedBy": "Updated By"
+      },
+      "status": {
+        "active": "Active",
+        "inactive": "Inactive"
+      },
+      "actions": {
+        "createProject": "Create Project",
+        "editProject": "Edit"
+      },
+      "form": {
+        "name": "Project Name",
+        "company": "Company",
+        "selectDate": "Select a date"
+      },
+      "validation": {
+        "nameMin": "Project name must be at least {n} characters"
+      }
+    }
+  }
+}

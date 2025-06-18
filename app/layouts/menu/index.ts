@@ -14,6 +14,11 @@ export const getMenus = (t: TranFunction, localePath: LocalePathFunction, appRep
         to: localePath('/admin/company')
       },
       {
+        label: t('menu.projects'),
+        icon: 'i-lucide-briefcase',
+        to: localePath('/admin/project')
+      },
+      {
         label: t('menu.subscriptions'),
         icon: 'i-lucide-credit-card',
         to: localePath('/admin/subscription')

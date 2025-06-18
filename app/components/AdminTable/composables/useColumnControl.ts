@@ -9,11 +9,14 @@ export default function useColumnControl<T>(columns: AdminTableColumn<T>[], tabl
   watchEffect(() => {
     for (const column of columns) {
       const columnKey = (column.accessorKey || column.id)!
+      // For nested properties like 'company.name', use the column id instead of the accessor key
+      const tableColumnKey = columnKey.includes('.') ? column.id! : columnKey
+
       if (selectedColumns.value.includes(columnKey)) {
-        tableRef.value?.tableApi?.getColumn(columnKey)?.toggleVisibility(true)
+        tableRef.value?.tableApi?.getColumn(tableColumnKey)?.toggleVisibility(true)
       }
       else {
-        tableRef.value?.tableApi?.getColumn(columnKey)?.toggleVisibility(false)
+        tableRef.value?.tableApi?.getColumn(tableColumnKey)?.toggleVisibility(false)
       }
     }
   })
