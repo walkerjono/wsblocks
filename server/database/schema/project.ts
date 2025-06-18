@@ -8,6 +8,9 @@ export const schedulingDirectionEnum = pgEnum('scheduling_direction', ['forward'
 // Define scheduling mode enum
 export const schedulingModeEnum = pgEnum('scheduling_mode', ['Normal', 'FixedDuration', 'FixedEffort', 'FixedUnits'])
 
+// Fields are based on Bryntum Gantt documentation
+// https://bryntum.com/products/gantt/docs/api/Gantt/model/ProjectModel
+
 export const project = pgTable('project', {
   id: uuid('id').primaryKey(),
   name: text('name').notNull(),
@@ -17,6 +20,7 @@ export const project = pgTable('project', {
   schedulingDirection: schedulingDirectionEnum('scheduling_direction').default('forward').notNull(),
   schedulingMode: schedulingModeEnum('scheduling_mode').default('Normal').notNull(),
   isEffortDriven: boolean('is_effort_driven').default(false),
+  tags: text('tags'),
   isActive: boolean('is_active').default(true),
   externalReference: text('external_reference'),
   createdAt: timestamp('created_at').defaultNow().notNull(),

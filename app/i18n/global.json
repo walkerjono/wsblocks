@@ -29,6 +29,7 @@
         "updatedBy": "Updated By",
         "isActive": "Active",
         "externalReference": "External Reference",
+        "tags": "Tags",
         "all": "All"
       }
     }

@@ -12,9 +12,18 @@
 
 ERD
 
-- [ ] Company
-  - review files inc. AuditLog
+- [-] Company
+  - tags on list and create/edit (inputTags)
   - default columns
   - default sort
   - delete
-- [ ] Project
+- [-] Project
+  - listview
+  - create modal
+  - edit page
+      - General
+      - Scope
+      - Audit
+  - default columns
+  - default sort
+  - delete

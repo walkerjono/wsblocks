@@ -6,6 +6,7 @@
    - id: uuid('id').primaryKey(),
    - name: text('name').notNull(),
    - <`TABLE_SPECIFIC_FIELDS` go here>
+   - tags: text('tags'),
    - isActive: boolean('is_active').default(true),
    - externalReference: text('external_reference'),
    - createdAt: timestamp('created_at').defaultNow().notNull(),
