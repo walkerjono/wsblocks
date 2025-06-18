@@ -3,6 +3,7 @@ import { getRouterParam } from 'h3'
 import { company } from '../../../database/schema'
 import { requireAuth } from '../../../utils/auth'
 import { getDB } from '../../../utils/db'
+import { createSanitizedError } from '../../../utils/errorHandler'
 
 export default defineEventHandler(async (event) => {
   // The middleware 1.auth.ts already checks if the user is an admin
@@ -10,11 +11,12 @@ export default defineEventHandler(async (event) => {
 
   const id = getRouterParam(event, 'id')
   if (!id) {
-    throw createError({
-      statusCode: 400,
-      statusMessage: 'Bad Request',
-      message: 'Company ID is required'
-    })
+    throw createSanitizedError(
+      400,
+      'Bad Request',
+      new Error('Company ID is required'),
+      'Company ID is required'
+    )
   }
 
   try {
@@ -27,11 +29,12 @@ export default defineEventHandler(async (event) => {
       .limit(1)
 
     if (!result || result.length === 0) {
-      throw createError({
-        statusCode: 404,
-        statusMessage: 'Not Found',
-        message: 'Company not found'
-      })
+      throw createSanitizedError(
+        404,
+        'Not Found',
+        new Error('Company not found'),
+        'Company not found'
+      )
     }
 
     return {
@@ -47,10 +50,11 @@ export default defineEventHandler(async (event) => {
     }
 
     // Only convert unknown errors to a 500 error
-    throw createError({
-      statusCode: 500,
-      statusMessage: 'Internal Server Error',
-      message: 'Failed to fetch company'
-    })
+    throw createSanitizedError(
+      500,
+      'Internal Server Error',
+      error,
+      'Failed to fetch company'
+    )
   }
 })

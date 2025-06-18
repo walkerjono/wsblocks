@@ -4,6 +4,7 @@ import { company } from '../../../database/schema'
 import { logAuditEvent } from '../../../utils/auditLogger'
 import { requireAuth } from '../../../utils/auth'
 import { getDB } from '../../../utils/db'
+import { createSanitizedError } from '../../../utils/errorHandler'
 
 const schema = z.object({
   name: z.string().min(4),
@@ -23,11 +24,12 @@ export default defineEventHandler(async (event) => {
 
     id = getRouterParam(event, 'id')
     if (!id) {
-      throw createError({
-        statusCode: 400,
-        statusMessage: 'Bad Request',
-        message: 'Company ID is required'
-      })
+      throw createSanitizedError(
+        400,
+        'Bad Request',
+        new Error('Company ID is required'),
+        'Company ID is required'
+      )
     }
 
     const body = await readValidatedBody(event, body => schema.parse(body))
@@ -40,11 +42,12 @@ export default defineEventHandler(async (event) => {
       .limit(1)
 
     if (!existingCompany || existingCompany.length === 0) {
-      throw createError({
-        statusCode: 404,
-        statusMessage: 'Not Found',
-        message: 'Company not found'
-      })
+      throw createSanitizedError(
+        404,
+        'Not Found',
+        new Error('Company not found'),
+        'Company not found'
+      )
     }
 
     const now = new Date()
@@ -98,10 +101,11 @@ export default defineEventHandler(async (event) => {
     }
 
     // Only convert unknown errors to a 500 error
-    throw createError({
-      statusCode: 500,
-      statusMessage: 'Internal Server Error',
-      message: `Failed to update company: ${error instanceof Error ? error.message : String(error)}`
-    })
+    throw createSanitizedError(
+      500,
+      'Internal Server Error',
+      error,
+      'Failed to update company'
+    )
   }
 })

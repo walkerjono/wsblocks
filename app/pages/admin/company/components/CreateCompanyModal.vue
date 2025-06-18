@@ -33,8 +33,37 @@ async function onSubmit({ data }: FormSubmitEvent<Schema>) {
   if (pending.value)
     return
   pending.value = true
+
   try {
-    const res = await $fetch<{ company: any }>('/api/admin/company/create', {
+    // Ensure we have a CSRF token before proceeding
+    const { globalCsrf } = await import('../../../../composables/useCsrf')
+
+    // If no CSRF token, fetch one first
+    if (!globalCsrf.csrfToken.value) {
+      console.log('No CSRF token found, fetching one...')
+      await $fetch('/api/admin/csrf', {
+        method: 'GET',
+        credentials: 'include'
+      })
+    }
+
+    console.log('Using CSRF token:', globalCsrf.csrfToken.value)
+
+    // Refresh the CSRF token before making the request
+    console.log('Refreshing CSRF token...')
+    const csrfResponse = await $fetch('/api/admin/csrf', {
+      method: 'GET',
+      credentials: 'include'
+    })
+    console.log('CSRF response:', csrfResponse)
+
+    // Get the latest token
+    const latestToken = globalCsrf.csrfToken.value
+    console.log('Latest CSRF token:', latestToken)
+
+    // Use $fetch directly for client-side fetching with explicit CSRF header
+    const nuxtApp = useNuxtApp()
+    const res = await nuxtApp.$customFetch<{ company: any }>('/api/admin/company/create', {
       method: 'POST',
       body: {
         name: data.name,
@@ -42,9 +71,16 @@ async function onSubmit({ data }: FormSubmitEvent<Schema>) {
         tags: data.tags && data.tags.length > 0 ? data.tags.join(',') : undefined,
         isActive: data.isActive,
         externalReference: data.externalReference || undefined
-      }
+      },
+      // Add CSRF token explicitly to headers with lowercase name for consistency
+      headers: {
+        'x-csrf-token': latestToken || ''
+      },
+      // Include credentials to ensure cookies are sent
+      credentials: 'include'
     })
-    if (res?.company) {
+
+    if (res.company) {
       open.value = false
       emit('created')
     }

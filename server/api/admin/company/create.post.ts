@@ -4,6 +4,7 @@ import { company } from '../../../database/schema'
 import { logAuditEvent } from '../../../utils/auditLogger'
 import { requireAuth } from '../../../utils/auth'
 import { getDB } from '../../../utils/db'
+import { createSanitizedError } from '../../../utils/errorHandler'
 
 const schema = z.object({
   name: z.string().min(4),
@@ -67,10 +68,11 @@ export default defineEventHandler(async (event) => {
     }
 
     // Only convert unknown errors to a 500 error
-    throw createError({
-      statusCode: 500,
-      statusMessage: 'Internal Server Error',
-      message: 'Failed to create company'
-    })
+    throw createSanitizedError(
+      500,
+      'Internal Server Error',
+      error,
+      'Failed to create company'
+    )
   }
 })

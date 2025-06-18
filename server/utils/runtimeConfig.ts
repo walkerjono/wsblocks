@@ -6,6 +6,11 @@ let runtimeConfigInstance: NitroRuntimeConfig
 export const generateRuntimeConfig = () => ({
   preset: process.env.NUXT_NITRO_PRESET,
   betterAuthSecret: process.env.NUXT_BETTER_AUTH_SECRET,
+  // Security
+  csrfSecret: process.env.NUXT_CSRF_SECRET,
+  rateLimitMax: Number.parseInt(process.env.NUXT_RATE_LIMIT_MAX || '100', 10),
+  rateLimitWindow: Number.parseInt(process.env.NUXT_RATE_LIMIT_WINDOW || '60', 10),
+  sanitizeErrors: process.env.NUXT_SANITIZE_ERRORS,
   // Stripe
   stripeEnabled: process.env.NUXT_STRIPE_ENABLED,
   stripeSecretKey: process.env.NUXT_STRIPE_SECRET_KEY,
@@ -43,7 +48,7 @@ if (typeof useRuntimeConfig !== 'undefined') {
 } else {
   // for cli: npm run auth:schema
   config()
-  runtimeConfigInstance = generateRuntimeConfig() as NitroRuntimeConfig
+  runtimeConfigInstance = generateRuntimeConfig() as any as NitroRuntimeConfig
 }
 
 export const runtimeConfig = runtimeConfigInstance

@@ -132,50 +132,62 @@ const columns: AdminTableColumn<Company>[] = [
 ]
 
 const fetchTypeCount = async (filter: FilterCondition[]) => {
-  const typeCount = await $fetch<ColumnCount[]>('/api/admin/count/company/type', {
+  // Use $fetch directly for client-side fetching
+  const nuxtApp = useNuxtApp()
+  const typeCount = await nuxtApp.$customFetch<ColumnCount[]>('/api/admin/count/company/type', {
     query: {
       filter: JSON.stringify(filter)
     }
   })
+
   const typeFilter = filters[1] as FilterCheckbox
   typeFilter.items.forEach((item) => {
-    const type = typeCount.find(type => type.column === item.id)
+    const type = typeCount.find(t => t.column === item.id)
     item.count = type ? type.count : 0
   })
 }
 
 const fetchTagsCount = async (filter: FilterCondition[]) => {
-  const tagsCount = await $fetch<ColumnCount[]>('/api/admin/count/company/tags', {
+  // Use $fetch directly for client-side fetching
+  const nuxtApp = useNuxtApp()
+  const tagsCount = await nuxtApp.$customFetch<ColumnCount[]>('/api/admin/count/company/tags', {
     query: {
       filter: JSON.stringify(filter)
     }
   })
+
   const tagsFilter = filters[2] as FilterCheckbox
   tagsFilter.items = tagsCount.map(tag => ({
     label: tag.column || 'Untagged',
     id: tag.column || '',
     count: tag.count
-  }))
+  })) || []
 }
 
 const fetchStatusCount = async (filter: FilterCondition[]) => {
-  const statusCount = await $fetch<ColumnCount[]>('/api/admin/count/company/isActive', {
+  // Use $fetch directly for client-side fetching
+  const nuxtApp = useNuxtApp()
+  const statusCount = await nuxtApp.$customFetch<ColumnCount[]>('/api/admin/count/company/isActive', {
     query: {
       filter: JSON.stringify(filter)
     }
   })
+
   const statusFilter = filters[3] as FilterTabs
   statusFilter.items.forEach((item) => {
     if (item.id === '')
       return
-    const status = statusCount.find(status => status.column === item.id)
+    const status = statusCount.find(s => s.column === item.id)
     item.count = status ? status.count : 0
   })
 }
 
 const fetchData: FetchDataFn<Company> = async ({ page, limit, sort, filter }) => {
   await Promise.allSettled([fetchTypeCount(filter), fetchTagsCount(filter), fetchStatusCount(filter)])
-  const result = await $fetch<PageData<Company>>('/api/admin/list/company', {
+
+  // Use $fetch directly for client-side fetching
+  const nuxtApp = useNuxtApp()
+  const result = await nuxtApp.$customFetch<PageData<Company>>('/api/admin/list/company', {
     query: {
       page,
       limit,
@@ -185,9 +197,10 @@ const fetchData: FetchDataFn<Company> = async ({ page, limit, sort, filter }) =>
       filter: JSON.stringify(filter)
     }
   })
+
   return {
-    data: result.data,
-    total: result.total
+    data: result.data || [],
+    total: result.total || 0
   }
 }
 </script>
