@@ -9,6 +9,7 @@
 - [x] feature flags
   - [ ] refactor NUXT_REDIS_ENABLED, NUXT_STRIPE_ENABLED
   - [ ] Add flag for localisation
+  - [ ] InputTags
 
 ERD
 
@@ -21,9 +22,9 @@ ERD
   - listview
   - create modal
   - edit page
-      - General
-      - Scope
-      - Audit
+    - General
+    - Scope
+    - Audit
   - default columns
   - default sort
   - delete

@@ -146,7 +146,7 @@ const onCancel = () => {
           :label="t('global.page.tags')"
           name="tags"
         >
-          <UInputTag
+          <UInputTags
             v-model="state.tags"
             class="w-full"
             :placeholder="t('global.page.tags')"
