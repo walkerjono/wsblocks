@@ -8,6 +8,7 @@ interface Company {
   id: string
   name: string
   type: string
+  tags?: string
   isActive: boolean
   externalReference?: string
   createdAt: string
@@ -17,7 +18,7 @@ const { t } = useI18n()
 const isCompanyModalOpen = ref(false)
 const isEditCompanyModalOpen = ref(false)
 const selectedCompanyId = ref('')
-const defaultSelectedColumns = ref(['name', 'type', 'isActive', 'actions'])
+const defaultSelectedColumns = ref(['name', 'type', 'tags', 'isActive', 'actions'])
 
 const filters: AdminTableFilter[] = reactive([
   {
@@ -33,6 +34,13 @@ const filters: AdminTableFilter[] = reactive([
     items: [
       { label: t('company.types.customer'), id: 'customer', count: 0 }
     ],
+    value: []
+  },
+  {
+    name: t('global.page.tags'),
+    field: 'tags',
+    type: 'checkbox',
+    items: [],
     value: []
   },
   {
@@ -101,6 +109,10 @@ const columns: AdminTableColumn<Company>[] = [
     header: t('company.columns.type')
   },
   {
+    accessorKey: 'tags',
+    header: t('global.page.tags')
+  },
+  {
     accessorKey: 'isActive',
     header: t('global.page.status')
   },
@@ -132,13 +144,27 @@ const fetchTypeCount = async (filter: FilterCondition[]) => {
   })
 }
 
+const fetchTagsCount = async (filter: FilterCondition[]) => {
+  const tagsCount = await $fetch<ColumnCount[]>('/api/admin/count/company/tags', {
+    query: {
+      filter: JSON.stringify(filter)
+    }
+  })
+  const tagsFilter = filters[2] as FilterCheckbox
+  tagsFilter.items = tagsCount.map(tag => ({
+    label: tag.column || 'Untagged',
+    id: tag.column || '',
+    count: tag.count
+  }))
+}
+
 const fetchStatusCount = async (filter: FilterCondition[]) => {
   const statusCount = await $fetch<ColumnCount[]>('/api/admin/count/company/isActive', {
     query: {
       filter: JSON.stringify(filter)
     }
   })
-  const statusFilter = filters[2] as FilterTabs
+  const statusFilter = filters[3] as FilterTabs
   statusFilter.items.forEach((item) => {
     if (item.id === '')
       return
@@ -148,7 +174,7 @@ const fetchStatusCount = async (filter: FilterCondition[]) => {
 }
 
 const fetchData: FetchDataFn<Company> = async ({ page, limit, sort, filter }) => {
-  await Promise.allSettled([fetchTypeCount(filter), fetchStatusCount(filter)])
+  await Promise.allSettled([fetchTypeCount(filter), fetchTagsCount(filter), fetchStatusCount(filter)])
   const result = await $fetch<PageData<Company>>('/api/admin/list/company', {
     query: {
       page,

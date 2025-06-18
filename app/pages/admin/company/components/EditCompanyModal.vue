@@ -16,6 +16,7 @@ const company = ref<any>(null)
 const schema = z.object({
   name: z.string().min(4, props.t('company.validation.nameMin', { n: 4 })),
   type: z.enum(['customer']),
+  tags: z.array(z.string()).optional(),
   isActive: z.boolean(),
   externalReference: z.string().optional()
 })
@@ -24,6 +25,7 @@ type Schema = zodOutput<typeof schema>
 const state = reactive({
   name: '',
   type: 'customer' as const,
+  tags: [] as string[],
   isActive: true,
   externalReference: ''
 })
@@ -41,6 +43,7 @@ watch([open, () => props.companyId], async ([isOpen, companyId]) => {
         // Update the state with the company data
         state.name = res.company.name || ''
         state.type = res.company.type || 'customer'
+        state.tags = res.company.tags ? res.company.tags.split(',') : []
         state.isActive = res.company.isActive !== undefined ? res.company.isActive : true
         state.externalReference = res.company.externalReference || ''
       }
@@ -70,6 +73,7 @@ async function onSubmit({ data }: FormSubmitEvent<Schema>) {
       body: {
         name: data.name,
         type: data.type,
+        tags: data.tags && data.tags.length > 0 ? data.tags.join(',') : undefined,
         isActive: data.isActive,
         externalReference: data.externalReference || undefined
       }
@@ -135,6 +139,17 @@ const onCancel = () => {
             :items="[
               { label: t('company.types.customer'), value: 'customer' }
             ]"
+          />
+        </UFormField>
+
+        <UFormField
+          :label="t('global.page.tags')"
+          name="tags"
+        >
+          <UInputTags
+            v-model="state.tags"
+            class="w-full"
+            :placeholder="t('global.page.tags')"
           />
         </UFormField>
 
